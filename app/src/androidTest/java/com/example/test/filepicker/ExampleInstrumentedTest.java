@@ -1,4 +1,4 @@
-package com.example.indianic.filepicker;
+package com.example.test.filepicker;
 
 import android.content.Context;
 import android.support.test.InstrumentationRegistry;

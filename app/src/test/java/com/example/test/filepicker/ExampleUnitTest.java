@@ -1,4 +1,4 @@
-package com.example.indianic.filepicker;
+package com.example.test.filepicker;
 
 import org.junit.Test;
 
