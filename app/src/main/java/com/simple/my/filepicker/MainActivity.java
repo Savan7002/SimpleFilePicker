@@ -13,11 +13,15 @@ import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ImageView;
+import android.widget.TextView;
 import android.widget.Toast;
+
+import com.bumptech.glide.Glide;
 
 import java.io.File;
 
-public class MainActivity extends AppCompatActivity implements View.OnClickListener {
+public class MainActivity extends AppCompatActivity implements View.OnClickListener, ImagePickerDialog.OnCompleteListener {
 
     /**
      * Request code for file picker
@@ -27,6 +31,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
      * Request code for file access permission
      */
     public final static int FILE_READ_PERMISSION_REQUEST_CODE = 101;
+    private TextView tvFileName;
+    private ImageView ivSelectedImage;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -34,14 +40,19 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         setContentView(R.layout.activity_main);
 
         final Button btnPickFile = (Button) findViewById(R.id.activity_main_btn_pick_file);
+        final Button btnPickImage = (Button) findViewById(R.id.activity_main_btn_pick_image);
+        tvFileName = (TextView) findViewById(R.id.activity_main_tv_file_name);
+        ivSelectedImage = (ImageView) findViewById(R.id.activity_main_iv_selected_file);
+
         btnPickFile.setOnClickListener(this);
+        btnPickImage.setOnClickListener(this);
     }
 
     @Override
     public void onClick(View view) {
         switch (view.getId()) {
             case R.id.activity_main_btn_pick_file:
-                final String permission = Manifest.permission.READ_EXTERNAL_STORAGE;
+                final String permission = Manifest.permission.WRITE_EXTERNAL_STORAGE;
                 if (checkForPermission(this, permission)) {
                     openFilePicker();
                 } else {
@@ -49,7 +60,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                         requestPermissions(new String[]{permission}, FILE_READ_PERMISSION_REQUEST_CODE);
                     }
                 }
-
+                break;
+            case R.id.activity_main_btn_pick_image:
+                final ImagePickerDialog imagePickerDialog = new ImagePickerDialog();
+                imagePickerDialog.show(getFragmentManager(), this.getClass().getSimpleName());
                 break;
         }
     }
@@ -104,6 +118,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 final File file = new File(path);
                 if (file.length() > 0) {
                     Toast.makeText(this, String.format("File %s selected", file.getName()), Toast.LENGTH_LONG).show();
+                    tvFileName.setText(file.getName());
                 } else {
                     Toast.makeText(this, "File is corrupt or not proper.", Toast.LENGTH_LONG).show();
                 }
@@ -111,5 +126,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 Toast.makeText(this, "Please select file from local storage.", Toast.LENGTH_LONG).show();
             }
         }
+    }
+
+    @Override
+    public void onComplete(String path) {
+        Glide.with(MainActivity.this).load(new File(path)).into(ivSelectedImage);
     }
 }
